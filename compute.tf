@@ -41,6 +41,9 @@ resource "aws_eks_cluster" "eks" {
   depends_on = [
     aws_iam_role.eks-iam-role,
   ]
+    tags = merge(local.common_tags, {
+    Name = "${local.project_name}-eks-cluster"
+  })
 }
 
 ## Worker Nodes
@@ -132,6 +135,9 @@ resource "aws_eks_node_group" "worker-node-group" {
     aws_iam_role_policy_attachment.AmazonEKSWorkerNodePolicy,
     aws_iam_role_policy_attachment.AmazonEKS_CNI_Policy,
   ]
+    tags = merge(local.common_tags, {
+    Name = "${local.project_name}-node-group"
+  })
 }
 
 resource "aws_eks_addon" "csi" {
@@ -169,9 +175,9 @@ resource "aws_security_group" "eks_cluster_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    "Name" = "eks-cluster-sg"
-  }
+  tags = merge(local.common_tags, {
+    Name = "${local.project_name}-eks-sg"
+  })
 }
 
 # Security Group for EKS nodes
@@ -194,7 +200,7 @@ resource "aws_security_group" "eks_nodes_sg" {
     from_port       = 0
     to_port         = 0
     protocol        = "-1"
-    security_groups = [aws_security_group.eks_nodes_sg.id]
+    self = true
   }
 
   # Allow connection with the EKS cluster
@@ -213,7 +219,7 @@ resource "aws_security_group" "eks_nodes_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    "Name" = "eks-nodes-sg"
-  }
+  tags = merge(local.common_tags, {
+    Name = "${local.project_name}-eks-nodes-sg"
+  })
 }
