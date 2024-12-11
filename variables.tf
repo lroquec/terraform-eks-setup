@@ -78,3 +78,13 @@ variable "instanceType" {
   type = list
   default = ["t4g.medium"]
 }
+
+variable "ec2_ssh_key" {
+  type = string
+  default = "mykey"
+}
+
+variable "tester-ip" {
+  type = string
+  description = "Public IP address from user"
+}
