@@ -1,5 +1,5 @@
 locals {
-  public_subnets_cidr  = [for k, v in var.subnet_config : v.cidr_block if v.public]
+  public_subnets_cidr = [for k, v in var.subnet_config : v.cidr_block if v.public]
 }
 data "aws_availability_zones" "azs" {
   state = "available"

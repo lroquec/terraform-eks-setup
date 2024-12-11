@@ -41,50 +41,50 @@ variable "subnet_config" {
 }
 
 variable "eksIAMRole" {
-  type = string
+  type    = string
   default = "devEKSCluster"
 }
 
 variable "EKSClusterName" {
-  type = string
+  type    = string
   default = "devEKS"
 }
 
 variable "k8sVersion" {
-  type = string
+  type    = string
   default = "1.30"
 }
 
 variable "workerNodeIAM" {
-  type = string
+  type    = string
   default = "devWorkerNodes"
 }
 
 variable "max_size" {
-  type = string
+  type    = string
   default = 3
 }
 
 variable "desired_size" {
-  type = string
+  type    = string
   default = 2
 }
 variable "min_size" {
-  type = string
+  type    = string
   default = 1
 }
 
 variable "instanceType" {
-  type = list
+  type    = list(any)
   default = ["t4g.medium"]
 }
 
 variable "ec2_ssh_key" {
-  type = string
+  type    = string
   default = "mykey"
 }
 
 variable "tester-ip" {
-  type = string
+  type        = string
   description = "Public IP address from user"
 }

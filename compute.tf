@@ -3,17 +3,17 @@ resource "aws_iam_role" "eks-iam-role" {
   name = var.eksIAMRole
 
   assume_role_policy = jsonencode({
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "eks.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-})
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "eks.amazonaws.com"
+        },
+        "Action" : "sts:AssumeRole"
+      }
+    ]
+  })
 }
 
 ## Attach the IAM policy to the IAM role
@@ -28,11 +28,11 @@ resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerRegistryReadOnly-EK
 
 ## Create the EKS cluster
 resource "aws_eks_cluster" "eks" {
-  name = var.EKSClusterName
+  name     = var.EKSClusterName
   role_arn = aws_iam_role.eks-iam-role.arn
 
   enabled_cluster_log_types = ["api", "audit", "scheduler", "controllerManager"]
-  version = var.k8sVersion
+  version                   = var.k8sVersion
   vpc_config {
     # You can set these as just private subnets if the Control Plane will be private
     subnet_ids = [module.vpc.public_subnets[0], module.vpc.public_subnets[1]]
@@ -115,8 +115,8 @@ resource "aws_eks_node_group" "worker-node-group" {
   node_group_name = "workernodes-${var.project_name}"
   node_role_arn   = aws_iam_role.workernodes.arn
   subnet_ids      = [module.vpc.public_subnets[0], module.vpc.public_subnets[1]]
-  instance_types = var.instanceType
-  disk_size      = 20
+  instance_types  = var.instanceType
+  disk_size       = 20
   scaling_config {
     desired_size = var.desired_size
     max_size     = var.max_size
@@ -124,7 +124,7 @@ resource "aws_eks_node_group" "worker-node-group" {
   }
 
   remote_access {
-    ec2_ssh_key = var.ec2_ssh_key
+    ec2_ssh_key               = var.ec2_ssh_key
     source_security_group_ids = [aws_security_group.eks_nodes_sg.id]
   }
 
@@ -186,22 +186,22 @@ resource "aws_security_group" "eks_nodes_sg" {
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = [var.tester-ip] # Tester public IP
-  
+
   }
 
   # Allow communication between nodes
   ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
     security_groups = [aws_security_group.eks_nodes_sg.id]
   }
 
   # Allow connection with the EKS cluster
   ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
     security_groups = [aws_security_group.eks_cluster_sg.id]
   }
 

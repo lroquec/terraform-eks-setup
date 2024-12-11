@@ -1,5 +1,5 @@
 terraform {
-   required_version = ">= 1.7.0"
+  required_version = ">= 1.7.0"
   backend "s3" {
     bucket = "lroquec-tf"
     key    = "eks-terraform.tfstate"
@@ -7,10 +7,10 @@ terraform {
   }
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
       version = "~> 5.76.0"
     }
-        random = {
+    random = {
       source  = "hashicorp/random"
       version = "~> 3.0"
     }
