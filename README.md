@@ -26,4 +26,6 @@
     }
   ]
 }
-3. Attach policy to role.
+## 3. Attach policy to role.
+## 4. Private subnets for RDS. eksctl creates 4 subnets 2 public 2 private??
+## 5. RDS instance in private subnet. Should be free tier.
