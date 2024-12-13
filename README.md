@@ -38,7 +38,7 @@
   --attach-policy-arn=arn:aws:iam::180789647333:policy/AWSLoadBalancerControllerIAMPolicy \
   --override-existing-serviceaccounts \
   --approve
-## 9. Install ALB helm chart:
+## 9. Install ALB helm chart: https://docs.aws.amazon.com/eks/latest/userguide/lbc-helm.html
 helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
   -n kube-system \
   --set clusterName=eksdemo1 \
