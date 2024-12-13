@@ -44,6 +44,7 @@ helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
   --set clusterName=eksdemo1 \
   --set serviceAccount.create=false \
   --set serviceAccount.name=aws-load-balancer-controller \
+## 10. https://github.com/stacksimplify/aws-eks-kubernetes-masterclass/tree/master/08-NEW-ELB-Application-LoadBalancers/08-06-Deploy-ExternalDNS-on-EKS
   --set region=us-east-1 \
   --set vpcId=vpc-0165a396e41e292a3 \
   --set image.repository=602401143452.dkr.ecr.us-east-1.amazonaws.com/amazon/aws-load-balancer-controller
