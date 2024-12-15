@@ -49,7 +49,6 @@ resource "aws_eks_cluster" "eks" {
   enabled_cluster_log_types = ["api", "audit", "scheduler", "controllerManager"]
   version                   = var.k8sVersion
 
-
   compute_config {
     enabled       = true
     node_pools    = ["general-purpose"]
@@ -400,11 +399,6 @@ resource "aws_iam_role_policy_attachment" "AmazonEKSWorkerNodePolicy" {
 
 resource "aws_iam_role_policy_attachment" "AmazonEKS_CNI_Policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-  role       = aws_iam_role.workernodes.name
-}
-
-resource "aws_iam_role_policy_attachment" "EC2InstanceProfileForImageBuilderECRContainerBuilds" {
-  policy_arn = "arn:aws:iam::aws:policy/EC2InstanceProfileForImageBuilderECRContainerBuilds"
   role       = aws_iam_role.workernodes.name
 }
 
