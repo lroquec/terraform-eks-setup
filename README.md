@@ -89,5 +89,7 @@ Resources are tagged with:
 - The project uses S3 backend for state management
 - Node group scaling is ignored in Terraform to allow external management
 - The cluster supports both private and public endpoint access
+- External DNS is configured with access to Route53 for automatic creation of DNS records.
+- Cluster is able to create and configure ALB.
 - Database subnets are provisioned for potential RDS integration
 
