@@ -93,3 +93,8 @@ Resources are tagged with:
 - Cluster is able to create and configure ALB.
 - Database subnets are provisioned for potential RDS integration
 
+## TO DO
+1. Add metric server.
+2. Add CloudWatch agent and fluentbit for nodes and for container insights.
+3. Add Istio.
+4. Add prometheous stack.
