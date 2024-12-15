@@ -96,3 +96,24 @@ variable "tester-ip" {
   type        = string
   description = "Public IP address from user"
 }
+
+# VPC Database Subnets
+variable "vpc_database_subnets" {
+  description = "VPC Database Subnets"
+  type = list(string)
+  default = ["10.0.151.0/24", "10.0.152.0/24"]
+}
+
+# VPC Create Database Subnet Group (True / False)
+variable "vpc_create_database_subnet_group" {
+  description = "VPC Create Database Subnet Group"
+  type = bool
+  default = true 
+}
+
+# VPC Create Database Subnet Route Table (True or False)
+variable "vpc_create_database_subnet_route_table" {
+  description = "VPC Create Database Subnet Route Table"
+  type = bool
+  default = true   
+}
