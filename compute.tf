@@ -184,7 +184,7 @@ resource "aws_eks_addon" "csi" {
 
   resolve_conflicts_on_create = "OVERWRITE"
   resolve_conflicts_on_update = "PRESERVE"
-  
+
   service_account_role_arn = aws_iam_role.workernodes.arn
 
   tags = merge(local.common_tags, {
