@@ -77,7 +77,7 @@ resource "aws_eks_cluster" "eks" {
   depends_on = [
     aws_iam_role.eks-iam-role,
   ]
-    tags = merge(local.common_tags, {
+  tags = merge(local.common_tags, {
     Name = "${local.project_name}-eks-cluster"
   })
 }
@@ -171,7 +171,7 @@ resource "aws_eks_node_group" "worker-node-group" {
     aws_iam_role_policy_attachment.AmazonEKSWorkerNodePolicy,
     aws_iam_role_policy_attachment.AmazonEKS_CNI_Policy,
   ]
-    tags = merge(local.common_tags, {
+  tags = merge(local.common_tags, {
     Name = "${local.project_name}-node-group"
   })
 }
@@ -233,10 +233,10 @@ resource "aws_security_group" "eks_nodes_sg" {
 
   # Allow communication between nodes
   ingress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    self = true
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
+    self      = true
   }
 
   # Allow connection with the EKS cluster
