@@ -71,7 +71,7 @@ resource "aws_eks_cluster" "eks" {
     endpoint_private_access = true
     endpoint_public_access  = true
     # You can set these as just private subnets if the Control Plane will be private
-    subnet_ids = [module.vpc.public_subnets[0], module.vpc.public_subnets[1], module.pvc.private_subnets[0], module.vpc.private_subnets[1]]
+    subnet_ids = [module.vpc.public_subnets[0], module.vpc.public_subnets[1], module.vpc.private_subnets[0], module.vpc.private_subnets[1]]
   }
 
   depends_on = [
