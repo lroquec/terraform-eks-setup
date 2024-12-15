@@ -33,13 +33,13 @@ module "vpc" {
 
   # Additional Tags to Subnets
   public_subnet_tags = {
-    Type                                              = "public-subnets"
-    "kubernetes.io/role/elb"                          = 1
+    Type                                          = "public-subnets"
+    "kubernetes.io/role/elb"                      = 1
     "kubernetes.io/cluster/${var.EKSClusterName}" = "shared"
   }
   private_subnet_tags = {
-    Type                                              = "private-subnets"
-    "kubernetes.io/role/internal-elb"                 = 1
+    Type                                          = "private-subnets"
+    "kubernetes.io/role/internal-elb"             = 1
     "kubernetes.io/cluster/${var.EKSClusterName}" = "shared"
   }
 
