@@ -53,7 +53,7 @@ resource "aws_eks_cluster" "eks" {
   compute_config {
     enabled       = true
     node_pools    = ["general-purpose"]
-    node_role_arn = aws_iam_role.node.arn
+    node_role_arn = aws_iam_role.workernodes.arn
   }
 
   kubernetes_network_config {
