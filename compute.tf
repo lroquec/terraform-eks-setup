@@ -47,6 +47,21 @@ resource "aws_iam_role_policy_attachment" "AmazonEKSVPCResourceController" {
   role       = aws_iam_role.eks-iam-role.name
 }
 
+resource "aws_iam_role_policy_attachment" "external_dns" {
+  role       = aws_iam_role.eks-iam-role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonRoute53FullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "appmesh_access" {
+  role       = aws_iam_role.eks-iam-role.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSAppMeshFullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "alb_ingress_access" {
+  role       = aws_iam_role.eks-iam-role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSLBControllerPolicy"
+}
+
 ## Create the EKS cluster
 resource "aws_eks_cluster" "eks" {
   name     = var.EKSClusterName
@@ -130,22 +145,6 @@ resource "aws_iam_role_policy_attachment" "asg_access" {
   role       = aws_iam_role.workernodes.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2AutoScalingRolePolicy"
 }
-
-resource "aws_iam_role_policy_attachment" "external_dns" {
-  role       = aws_iam_role.eks-iam-role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonRoute53FullAccess"
-}
-
-resource "aws_iam_role_policy_attachment" "appmesh_access" {
-  role       = aws_iam_role.eks-iam-role.name
-  policy_arn = "arn:aws:iam::aws:policy/AWSAppMeshFullAccess"
-}
-
-resource "aws_iam_role_policy_attachment" "alb_ingress_access" {
-  role       = aws_iam_role.eks-iam-role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSLBControllerPolicy"
-}
-
 
 resource "aws_eks_node_group" "worker-node-group" {
   cluster_name    = aws_eks_cluster.eks.name
