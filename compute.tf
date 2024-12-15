@@ -92,6 +92,7 @@ resource "aws_eks_cluster" "eks" {
     endpoint_public_access  = true
     # You can set these as just private subnets if the Control Plane will be private
     subnet_ids = [module.vpc.public_subnets[0], module.vpc.public_subnets[1], module.vpc.private_subnets[0], module.vpc.private_subnets[1]]
+    public_access_cidrs     = var.cluster_endpoint_public_access_cidrs 
   }
 
   depends_on = [
@@ -188,66 +189,4 @@ resource "aws_iam_openid_connect_provider" "eks_oidc_provider" {
     "9e99a48a9960a6e3c123f6cf3f97cd3a17da5c85"
   ]
   url = aws_eks_cluster.eks.identity[0].oidc[0].issuer
-}
-
-# Security Group for EKS cluster
-resource "aws_security_group" "eks_cluster_sg" {
-  name        = "eks-cluster-sg"
-  description = "EKS Cluster Security Group"
-  vpc_id      = module.vpc.vpc_id
-
-  # Allow inbound traffic on port 443
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = [var.tester-ip] # Tester public IP
-  }
-
-  # Egress rule for all traffic
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = merge(local.common_tags, {
-    Name = "${local.project_name}-eks-sg"
-  })
-}
-
-# Security Group for EKS nodes in private subnets with natgateway access
-resource "aws_security_group" "eks_nodes_sg" {
-  name        = "eks-nodes-sg"
-  description = "EKS Nodes Security Group"
-  vpc_id      = module.vpc.vpc_id
-
-  # Allow all inbound traffic from the EKS cluster security group
-  ingress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    security_groups = [aws_security_group.eks_cluster_sg.id]
-  }
-
-  # Allow all outbound traffic trough the NAT Gateway
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # Allow all inbound traffic from nodes 
-  ingress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
-    self      = true
-  }
-
-  tags = merge(local.common_tags, {
-    Name = "${local.project_name}-eks-nodes-sg"
-  })
 }
