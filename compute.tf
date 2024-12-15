@@ -159,9 +159,8 @@ resource "aws_eks_node_group" "worker-node-group" {
     min_size     = var.min_size
   }
 
-  remote_access {
-    ec2_ssh_key               = var.ec2_ssh_key
-    source_security_group_ids = [aws_security_group.eks_nodes_sg.id]
+  update_config {
+    max_unavailable = 1
   }
 
   depends_on = [
@@ -171,6 +170,11 @@ resource "aws_eks_node_group" "worker-node-group" {
   tags = merge(local.common_tags, {
     Name = "${local.project_name}-node-group"
   })
+
+  # Optional: Allow external changes without Terraform plan difference
+  lifecycle {
+    ignore_changes = [scaling_config[0].desired_size]
+  }
 }
 
 resource "aws_eks_addon" "csi" {
