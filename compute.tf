@@ -181,6 +181,15 @@ resource "aws_eks_node_group" "worker-node-group" {
 resource "aws_eks_addon" "csi" {
   cluster_name = aws_eks_cluster.eks.name
   addon_name   = "aws-ebs-csi-driver"
+
+  resolve_conflicts_on_create = "OVERWRITE"
+  resolve_conflicts_on_update = "PRESERVE"
+  
+  service_account_role_arn = aws_iam_role.workernodes.arn
+
+  tags = merge(local.common_tags, {
+    "eks.amazonaws.com/component" = "ebs-csi-controller"
+  })
 }
 
 resource "aws_iam_openid_connect_provider" "eks_oidc_provider" {
@@ -189,4 +198,87 @@ resource "aws_iam_openid_connect_provider" "eks_oidc_provider" {
     "9e99a48a9960a6e3c123f6cf3f97cd3a17da5c85"
   ]
   url = aws_eks_cluster.eks.identity[0].oidc[0].issuer
+}
+
+# Additional Security Group Rules
+resource "aws_security_group_rule" "cluster_ingress" {
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = var.cluster_endpoint_public_access_cidrs
+  security_group_id = aws_eks_cluster.eks.vpc_config[0].cluster_security_group_id
+}
+
+resource "aws_security_group_rule" "nodes_ingress" {
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "-1"
+  source_security_group_id = aws_eks_cluster.eks.vpc_config[0].cluster_security_group_id
+  security_group_id        = aws_eks_cluster.eks.vpc_config[0].cluster_security_group_id
+}
+
+# External DNS Configuration
+resource "aws_iam_policy" "external_dns" {
+  name = "${var.project_name}-external-dns"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "route53:ChangeResourceRecordSets",
+          "route53:ListHostedZones",
+          "route53:ListResourceRecordSets"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "helm_release" "external_dns" {
+  name       = "external-dns"
+  repository = "https://kubernetes-sigs.github.io/external-dns"
+  chart      = "external-dns"
+  namespace  = "kube-system"
+
+  set {
+    name  = "provider"
+    value = "aws"
+  }
+
+  set {
+    name  = "serviceAccount.create"
+    value = "true"
+  }
+
+  set {
+    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+    value = aws_iam_role.external_dns.arn
+  }
+}
+
+resource "helm_release" "aws_load_balancer_controller" {
+  name       = "aws-load-balancer-controller"
+  repository = "https://aws.github.io/eks-charts"
+  chart      = "aws-load-balancer-controller"
+  namespace  = "kube-system"
+
+  set {
+    name  = "clusterName"
+    value = aws_eks_cluster.eks.name
+  }
+
+  set {
+    name  = "serviceAccount.create"
+    value = "true"
+  }
+
+  set {
+    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+    value = aws_iam_role.aws_load_balancer_controller.arn
+  }
 }
