@@ -1,51 +1,93 @@
-# terraform-eks
-# TO DO FOR EBS:
-## 1. Node Instance role, get it or create it.
-## 2. Create policy:
+# EKS Terraform Infrastructure Project
 
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "ec2:AttachVolume",
-        "ec2:CreateSnapshot",
-        "ec2:CreateTags",
-        "ec2:CreateVolume",
-        "ec2:DeleteSnapshot",
-        "ec2:DeleteTags",
-        "ec2:DeleteVolume",
-        "ec2:DescribeInstances",
-        "ec2:DescribeSnapshots",
-        "ec2:DescribeTags",
-        "ec2:DescribeVolumes",
-        "ec2:DetachVolume"
-      ],
-      "Resource": "*"
-    }
-  ]
-}
-## 3. Attach policy to role.
-## 4. Private subnets for RDS. eksctl creates 4 subnets 2 public 2 private??
-## 5. RDS instance in private subnet. Should be free tier. This also needs a SG.
-## 6. CHANGE node group to private with --node-private-networking
-## 7. Add IAM policy AWSLoadBalancerControllerIAMPolicy with https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json
-## 8. eksctl create iamserviceaccount \
-  --cluster=eksdemo1 \
-  --namespace=kube-system \
-  --name=aws-load-balancer-controller \
-  --attach-policy-arn=arn:aws:iam::180789647333:policy/AWSLoadBalancerControllerIAMPolicy \
-  --override-existing-serviceaccounts \
-  --approve
-## 9. Install ALB helm chart: https://docs.aws.amazon.com/eks/latest/userguide/lbc-helm.html
-helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
-  -n kube-system \
-  --set clusterName=eksdemo1 \
-  --set serviceAccount.create=false \
-  --set serviceAccount.name=aws-load-balancer-controller \
-## 10. https://github.com/stacksimplify/aws-eks-kubernetes-masterclass/tree/master/08-NEW-ELB-Application-LoadBalancers/08-06-Deploy-ExternalDNS-on-EKS
-  --set region=us-east-1 \
-  --set vpcId=vpc-0165a396e41e292a3 \
-  --set image.repository=602401143452.dkr.ecr.us-east-1.amazonaws.com/amazon/aws-load-balancer-controller
-  
+This repository contains Terraform configurations to deploy an Amazon EKS (Elastic Kubernetes Service) cluster with associated networking and compute resources.
+
+## Prerequisites
+
+- Terraform >= 1.7.0
+- AWS CLI configured
+- S3 bucket for Terraform state (`lroquec-tf`)
+
+## Infrastructure Components
+
+### VPC and Networking
+- Custom VPC with public and private subnets
+- NAT Gateway for private subnet connectivity
+- Database subnets
+- Proper tagging for EKS integration
+
+### EKS Cluster
+- EKS cluster with version 1.30
+- Private and public endpoint access
+- Enabled cluster logging
+- EBS CSI driver addon
+- OIDC provider configuration
+
+### Node Groups
+- Managed node group using t4g.medium instances
+- Autoscaling configuration:
+  - Min size: 1
+  - Desired size: 2
+  - Max size: 3
+- Nodes deployed in private subnets
+
+### IAM Configuration
+- EKS cluster role with necessary policies
+- Worker node IAM role with required permissions
+- Integration with various AWS services through IAM policies:
+  - EBS CSI Driver
+  - Load Balancer Controller
+  - VPC Resource Controller
+  - External DNS
+  - App Mesh
+
+## Variables
+
+Key variables that can be customized:
+
+```hcl
+project_name         = "your-project-name"
+vpc_cidr            = "10.0.0.0/16"
+EKSClusterName      = "devEKS"
+k8sVersion          = "1.30"
+```
+
+## Usage
+
+1. Initialize Terraform:
+```bash
+terraform init
+```
+
+2. Review planned changes:
+```bash
+terraform plan
+```
+
+3. Apply the configuration:
+```bash
+terraform get
+terraform apply
+```
+
+## Outputs
+
+- `vpc_id`: The ID of the created VPC
+- `cluster_id`: The name/id of the EKS cluster
+- `cluster_endpoint`: The endpoint for your EKS Kubernetes API
+
+## Tags
+
+Resources are tagged with:
+- Environment: dev
+- Managed by: Terraform
+- CreatedBy: lroquec
+- Owner: DevOps Team
+
+## Notes
+
+- The project uses S3 backend for state management
+- Node group scaling is ignored in Terraform to allow external management
+- The cluster supports both private and public endpoint access
+- Database subnets are provisioned for potential RDS integration
+
