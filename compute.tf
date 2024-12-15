@@ -506,43 +506,34 @@ resource "aws_security_group" "eks_cluster_sg" {
   })
 }
 
-# Security Group for EKS nodes
+# Security Group for EKS nodes in private subnets with natgateway access
 resource "aws_security_group" "eks_nodes_sg" {
   name        = "eks-nodes-sg"
   description = "EKS Nodes Security Group"
   vpc_id      = module.vpc.vpc_id
 
-  # Allow inbound traffic on port 22 from the tester IP
+  # Allow all inbound traffic from the EKS cluster security group
   ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [var.tester-ip] # Tester public IP
-
-  }
-
-  # Allow communication between nodes
-  ingress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
-    self      = true
-  }
-
-  # Allow connection with the EKS cluster
-  ingress {
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     security_groups = [aws_security_group.eks_cluster_sg.id]
   }
 
-  # Egress rule for all traffic
+  # Allow all outbound traffic trough the NAT Gateway
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"] 
+  }
+
+# Allow all inbound traffic from nodes 
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    self = true
   }
 
   tags = merge(local.common_tags, {
