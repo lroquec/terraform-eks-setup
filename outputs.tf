@@ -1,3 +1,9 @@
+# VPC ID
+output "vpc_id" {
+  description = "The ID of the VPC"
+  value       = module.vpc.vpc_id
+}
+
 # EKS Cluster Outputs
 output "cluster_id" {
   description = "The name/id of the EKS cluster."
