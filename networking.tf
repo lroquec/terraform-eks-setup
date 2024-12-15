@@ -16,7 +16,7 @@ module "vpc" {
   public_subnets          = local.public_subnets_cidr
   map_public_ip_on_launch = true
   enable_nat_gateway      = true
-  single_nat_gateway = true
+  single_nat_gateway      = true
 
   tags = merge(local.common_tags, {
     Name = "${local.project_name}-vpc"
