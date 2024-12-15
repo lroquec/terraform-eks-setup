@@ -87,14 +87,10 @@ variable "instanceType" {
   default = ["t4g.medium"]
 }
 
-variable "ec2_ssh_key" {
-  type    = string
-  default = "mykey"
-}
-
-variable "tester-ip" {
-  type        = string
-  description = "Public IP address from user"
+variable "cluster_endpoint_public_access_cidrs" {
+  description = "List of CIDR blocks which can access the Amazon EKS public API server endpoint."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
 }
 
 # VPC Database Subnets
