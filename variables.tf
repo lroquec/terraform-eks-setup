@@ -30,6 +30,14 @@ variable "subnet_config" {
       cidr_block = "10.0.2.0/24"
       public     = true
     }
+    subnet3 = {
+      cidr_block = "10.0.3.0/24"
+      public     = false
+    }
+    subnet4 = {
+      cidr_block = "10.0.4.0/24"
+      public     = false
+    }
   }
 
   validation {
