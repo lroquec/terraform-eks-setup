@@ -22,6 +22,25 @@ resource "aws_iam_role_policy_attachment" "AmazonEKSClusterPolicy" {
   role       = aws_iam_role.eks-iam-role.name
 }
 
+resource "aws_iam_role_policy_attachment" "AmazonEKSComputePolicy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSComputePolicy"
+  role       = aws_iam_role.eks-iam-role.name
+}
+
+resource "aws_iam_role_policy_attachment" "AmazonEKSBlockStoragePolicy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSBlockStoragePolicy"
+  role       = aws_iam_role.eks-iam-role.name
+}
+
+resource "aws_iam_role_policy_attachment" "AmazonEKSLoadBalancingPolicy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSLoadBalancingPolicy"
+  role       = aws_iam_role.eks-iam-role.name
+}
+
+resource "aws_iam_role_policy_attachment" "AmazonEKSNetworkingPolicy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSNetworkingPolicy"
+  role       = aws_iam_role.eks-iam-role.name
+}
 ## Create the EKS cluster
 resource "aws_eks_cluster" "eks" {
   name     = var.EKSClusterName
@@ -29,9 +48,30 @@ resource "aws_eks_cluster" "eks" {
 
   enabled_cluster_log_types = ["api", "audit", "scheduler", "controllerManager"]
   version                   = var.k8sVersion
+
+
+  compute_config {
+    enabled       = true
+    node_pools    = ["general-purpose"]
+    node_role_arn = aws_iam_role.node.arn
+  }
+
+  kubernetes_network_config {
+    elastic_load_balancing {
+      enabled = true
+    }
+  }
+
+  storage_config {
+    block_storage {
+      enabled = true
+    }
+  }
   vpc_config {
+    endpoint_private_access = true
+    endpoint_public_access  = true
     # You can set these as just private subnets if the Control Plane will be private
-    subnet_ids = [module.vpc.public_subnets[0], module.vpc.public_subnets[1]]
+    subnet_ids = [module.vpc.public_subnets[0], module.vpc.public_subnets[1], module.pvc.private_subnets[0], module.vpc.private_subnets[1]]
   }
 
   depends_on = [
