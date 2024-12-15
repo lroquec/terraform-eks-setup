@@ -443,7 +443,7 @@ resource "aws_eks_node_group" "worker-node-group" {
   cluster_name    = aws_eks_cluster.eks.name
   node_group_name = "workernodes-${var.project_name}"
   node_role_arn   = aws_iam_role.workernodes.arn
-  subnet_ids      = [module.vpc.public_subnets[0], module.vpc.public_subnets[1]]
+  subnet_ids      = [module.vpc.private_subnets[0], module.vpc.private_subnets[1]]
   instance_types  = var.instanceType
   disk_size       = 20
   scaling_config {
