@@ -7,7 +7,7 @@ data "aws_availability_zones" "azs" {
 }
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "5.5.3"
+  version = "5.9.0"
 
   name                    = "${local.project_name}-vpc"
   cidr                    = var.vpc_cidr
@@ -17,6 +17,7 @@ module "vpc" {
   map_public_ip_on_launch = true
   enable_nat_gateway      = true
   single_nat_gateway      = true
+  one_nat_gateway_per_az = false
 
   # VPC DNS Parameters
   enable_dns_hostnames = true
@@ -36,15 +37,18 @@ module "vpc" {
     Type                                          = "public-subnets"
     "kubernetes.io/role/elb"                      = 1
     "kubernetes.io/cluster/${var.EKSClusterName}" = "shared"
+    Name = "${local.project_name}-public-subnet"
   }
   private_subnet_tags = {
     Type                                          = "private-subnets"
     "kubernetes.io/role/internal-elb"             = 1
     "kubernetes.io/cluster/${var.EKSClusterName}" = "shared"
+    Name = "${local.project_name}-private-subnet"
   }
 
   database_subnet_tags = {
     Type = "database-subnets"
+    Name = "${local.project_name}-database-subnet"
   }
 
 }
