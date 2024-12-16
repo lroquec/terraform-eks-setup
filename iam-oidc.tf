@@ -3,7 +3,7 @@
 data "aws_partition" "current" {}
 
 resource "aws_iam_openid_connect_provider" "eks_oidc_provider" {
-  client_id_list  = ["sts.${data.aws_partition.current.dns_suffix}"]
+  client_id_list = ["sts.${data.aws_partition.current.dns_suffix}"]
   thumbprint_list = [
     "9e99a48a9960a6e3c123f6cf3f97cd3a17da5c85"
   ]
