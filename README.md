@@ -246,24 +246,6 @@ aws eks update-nodegroup-config \
   - **Type:** `bool`  
   - **Default:** `true`
 
-## Usage
-
-1. Initialize Terraform:
-```bash
-terraform init
-```
-
-2. Review planned changes:
-```bash
-terraform plan
-```
-
-3. Apply the configuration:
-```bash
-terraform get
-terraform apply
-```
-
 ## Outputs
 
 ### VPC Outputs
@@ -295,3 +277,21 @@ terraform apply
 - **`aws_iam_openid_connect_provider_extract_from_arn`**  
   - **Description:** The OIDC provider extracted from the ARN.  
   - **Value:** Sourced from `module.eks.oidc_provider`.
+
+## Usage
+
+1. Initialize Terraform:
+```bash
+terraform init
+```
+
+2. Review planned changes:
+```bash
+terraform plan
+```
+
+3. Apply the configuration:
+```bash
+terraform get
+terraform apply
+```
