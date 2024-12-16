@@ -33,14 +33,113 @@ This repository contains Terraform configurations to deploy an Amazon EKS (Elast
 
 ## Variables
 
-Key variables that can be customized:
+### Project Configuration
 
-```hcl
-project_name         = "your-project-name"
-vpc_cidr            = "10.0.0.0/16"
-EKSClusterName      = "devEKS"
-k8sVersion          = "1.30"
-```
+- **`project_name`**  
+  - **Description:** The name of the project.  
+  - **Type:** `string`  
+
+### VPC Configuration
+
+- **`vpc_cidr`**  
+  - **Description:** The CIDR block for the VPC.  
+  - **Type:** `string`  
+  - **Default:** `10.0.0.0/16`  
+  - **Validation:** Ensures the provided value is a valid CIDR block.
+
+- **`subnet_config`**  
+  - **Description:** Configuration for the VPC subnets, defining CIDR blocks and public/private settings.  
+  - **Type:** `map(object)`  
+  - **Default:**  
+    ```hcl
+    {
+      subnet1 = {
+        cidr_block = "10.0.1.0/24"
+        public     = true
+      }
+      subnet2 = {
+        cidr_block = "10.0.2.0/24"
+        public     = true
+      }
+      subnet3 = {
+        cidr_block = "10.0.3.0/24"
+        public     = false
+      }
+      subnet4 = {
+        cidr_block = "10.0.4.0/24"
+        public     = false
+      }
+    }
+    ```  
+  - **Validation:** Ensures all `cidr_block` values are valid CIDR blocks.
+
+### EKS Cluster Configuration
+
+- **`eksIAMRole`**  
+  - **Description:** IAM Role for the EKS cluster.  
+  - **Type:** `string`  
+  - **Default:** `devEKSCluster`
+
+- **`EKSClusterName`**  
+  - **Description:** Name of the EKS cluster.  
+  - **Type:** `string`  
+  - **Default:** `devEKS`
+
+- **`k8sVersion`**  
+  - **Description:** Kubernetes version for the EKS cluster.  
+  - **Type:** `string`  
+  - **Default:** `1.30`
+
+- **`workerNodeIAM`**  
+  - **Description:** IAM Role for EKS worker nodes.  
+  - **Type:** `string`  
+  - **Default:** `devWorkerNodes`
+
+### EKS Cluster Scaling
+
+- **`max_size`**  
+  - **Description:** Maximum size of the worker node group.  
+  - **Type:** `string`  
+  - **Default:** `3`
+
+- **`desired_size`**  
+  - **Description:** Desired size of the worker node group.  
+  - **Type:** `string`  
+  - **Default:** `2`
+
+- **`min_size`**  
+  - **Description:** Minimum size of the worker node group.  
+  - **Type:** `string`  
+  - **Default:** `1`
+
+- **`instanceType`**  
+  - **Description:** List of instance types for the worker nodes.  
+  - **Type:** `list(any)`  
+  - **Default:** `["t3.medium"]`
+
+### API Endpoint Access
+
+- **`cluster_endpoint_public_access_cidrs`**  
+  - **Description:** List of CIDR blocks allowed to access the Amazon EKS public API server endpoint.  
+  - **Type:** `list(string)`  
+  - **Default:** `["0.0.0.0/0"]`
+
+### Database Subnet Configuration
+
+- **`vpc_database_subnets`**  
+  - **Description:** CIDR blocks for database subnets.  
+  - **Type:** `list(string)`  
+  - **Default:** `["10.0.151.0/24", "10.0.152.0/24"]`
+
+- **`vpc_create_database_subnet_group`**  
+  - **Description:** Whether to create a database subnet group.  
+  - **Type:** `bool`  
+  - **Default:** `true`
+
+- **`vpc_create_database_subnet_route_table`**  
+  - **Description:** Whether to create a route table for the database subnet.  
+  - **Type:** `bool`  
+  - **Default:** `true`
 
 ## Usage
 

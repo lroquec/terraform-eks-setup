@@ -87,12 +87,6 @@ variable "instanceType" {
   default = ["t3.medium"]
 }
 
-variable "cluster_endpoint_public_access_cidrs" {
-  description = "List of CIDR blocks which can access the Amazon EKS public API server endpoint."
-  type        = list(string)
-  default     = ["0.0.0.0/0"]
-}
-
 # VPC Database Subnets
 variable "vpc_database_subnets" {
   description = "VPC Database Subnets"
