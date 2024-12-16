@@ -292,6 +292,5 @@ terraform plan
 
 3. Apply the configuration:
 ```bash
-terraform get
 terraform apply
 ```
