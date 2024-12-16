@@ -38,8 +38,6 @@ This repository contains Terraform configurations to deploy an Amazon EKS (Elast
   - EBS CSI Driver
   - Load Balancer Controller
   - VPC Resource Controller
-  - External DNS
-  - App Mesh
 
 ## Variables
 
@@ -89,12 +87,4 @@ Resources are tagged with:
 - The project uses S3 backend for state management
 - Node group scaling is ignored in Terraform to allow external management
 - The cluster supports both private and public endpoint access
-- External DNS is configured with access to Route53 for automatic creation of DNS records.
-- Cluster is able to create and configure ALB.
 - Database subnets are provisioned for potential RDS integration
-
-## TO DO
-1. Add metric server.
-2. Add CloudWatch agent and fluentbit for nodes and for container insights.
-3. Add Istio.
-4. Add prometheous stack.
