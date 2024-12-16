@@ -40,7 +40,7 @@ module "eks" {
 
   eks_managed_node_group_defaults = {
     ami_type       = "AL2023_x86_64_STANDARD"
-    instance_types = [var.instanceType]
+    instance_types = var.instanceType
 
     iam_role_additional_policies = {
       ebs_policy                                 = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy" #IAM rights needed by CSI driver
