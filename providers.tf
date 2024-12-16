@@ -4,7 +4,7 @@ terraform {
     bucket = "lroquec-tf"
     key    = "eks-terraform.tfstate"
     region = "us-east-1"
-    # For State Locking
+    # For State Locking. Required for production environments
     # dynamodb_table = "demo-ekscluster"
   }
   required_providers {
