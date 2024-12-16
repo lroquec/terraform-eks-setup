@@ -7,7 +7,7 @@ resource "aws_iam_openid_connect_provider" "eks_oidc_provider" {
   thumbprint_list = [
     "9e99a48a9960a6e3c123f6cf3f97cd3a17da5c85"
   ]
-  url = aws_eks_cluster.eks.identity[0].oidc[0].issuer
+  url = module.eks.cluster_oidc_issuer_url
 
   tags = merge(
     {
