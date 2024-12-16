@@ -16,20 +16,125 @@ This repository contains Terraform configurations to deploy an Amazon EKS (Elast
 - Database subnets
 - Proper tagging for EKS integration
 
-### EKS Cluster
-- EKS cluster with version 1.31
-- Public endpoint access
-- Enabled cluster logging
-- EBS CSI driver addon
-- OIDC provider configuration
+### EKS Module
 
-### Node Groups
-- Managed node group using t3.medium instances
-- Autoscaling configuration:
-  - Min size: 1
-  - Desired size: 2
-  - Max size: 3
-- Nodes deployed in private subnets
+- **`source`**  
+  - **Value:** `terraform-aws-modules/eks/aws`  
+  - **Version:** `~> 20.0`  
+
+### Cluster Configuration
+
+- **`cluster_name`**  
+  - **Value:** Derived from the variable `var.EKSClusterName`.  
+
+- **`cluster_version`**  
+  - **Value:** `1.31`.  
+
+- **`cluster_endpoint_public_access`**  
+  - **Value:** `true` (enables public access to the API server).  
+
+- **`vpc_id`**  
+  - **Value:** Referenced from `module.vpc.vpc_id`.  
+
+- **`subnet_ids`**  
+  - **Value:** Referenced from `module.vpc.private_subnets`.  
+
+- **`cluster_enabled_log_types`**  
+  - **Description:** Enabled logs for the cluster.  
+  - **Values:**  
+    - `audit`  
+    - `api`  
+    - `authenticator`  
+    - `controllerManager`  
+    - `scheduler`  
+
+### Cluster Add-ons
+
+Add-ons deployed with the cluster:
+
+- `coredns`
+- `kube-proxy`
+- `vpc-cni` (most recent version enabled)  
+- `aws-ebs-csi-driver` (most recent version enabled)  
+- `amazon-cloudwatch-observability` (most recent version enabled)  
+
+### Cluster Access
+
+- **`enable_cluster_creator_admin_permissions`**  
+  - **Description:** Grants administrative permissions to the identity creating the cluster.  
+  - **Value:** `true`.
+
+### Managed Node Group Defaults
+
+- **`ami_type`**  
+  - **Value:** `AL2023_x86_64_STANDARD`.  
+
+- **`instance_types`**  
+  - **Value:** Referenced from `var.instanceType`.  
+
+- **`iam_role_additional_policies`**  
+  - **Policies:**  
+    - `AmazonEBSCSIDriverPolicy`  
+    - `AutoScalingFullAccess`  
+    - `CloudWatchAgentServerPolicy`  
+    - `AWSXrayWriteOnlyAccess`  
+
+### Managed Node Groups
+
+- **Node Group Name:** `node_group`  
+- **`min_size`**  
+  - **Value:** `2`.  
+- **`max_size`**  
+  - **Value:** `3`.  
+- **`desired_size`**  
+  - **Value:** Referenced from `var.desired_size`.
+
+### Security Group Rules
+
+- **Rule Name:** `http_traffic_node_to_node`  
+  - **Description:** Allow HTTP traffic between nodes.  
+  - **Type:** `ingress`.  
+  - **Port Range:** `80`.  
+  - **Protocol:** `tcp`.  
+
+### Fargate Profile Defaults
+
+- **`iam_role_additional_policies`**  
+  - **Policies:**  
+    - `AmazonEBSCSIDriverPolicy`  
+    - `AutoScalingFullAccess`  
+    - `CloudWatchAgentServerPolicy`  
+    - `AWSXrayWriteOnlyAccess`  
+
+### Fargate Profiles
+
+- **Profile Name:** `deployment`  
+  - **Namespace:** `fargate-test`.  
+  - **Tags:**  
+    - `Owner: secondary`.
+
+### Tags
+
+- Tags applied to the cluster are referenced from `local.common_tags`.
+
+---
+
+## Resource: Update Desired Size
+
+A `null_resource` is used to trigger updates to the desired size of the node group when the `var.desired_size` changes.
+
+### Provisioner
+
+- **Command:** Updates the node group scaling configuration using the AWS CLI.  
+
+```bash
+aws eks update-nodegroup-config \
+  --cluster-name ${module.eks.cluster_name} \
+  --nodegroup-name ${element(split(":", module.eks.eks_managed_node_groups["node_group"].node_group_id), 1)} \
+  --scaling-config desiredSize=${var.desired_size} \
+  --region us-east-1 \
+  --profile default
+```
 
 ## Variables
 
@@ -190,18 +295,3 @@ terraform apply
 - **`aws_iam_openid_connect_provider_extract_from_arn`**  
   - **Description:** The OIDC provider extracted from the ARN.  
   - **Value:** Sourced from `module.eks.oidc_provider`.
-
-## Tags
-
-Resources are tagged with:
-- Environment: dev
-- Managed by: Terraform
-- CreatedBy: lroquec
-- Owner: DevOps Team
-
-## Notes
-
-- The project uses S3 backend for state management
-- Node group scaling is ignored in Terraform to allow external management
-- The cluster supports both private and public endpoint access
-- Database subnets are provisioned for potential RDS integration
