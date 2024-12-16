@@ -197,17 +197,3 @@ resource "aws_security_group_rule" "nodes_ingress" {
   security_group_id        = aws_eks_cluster.eks.vpc_config[0].cluster_security_group_id
 }
 
-# EBS CSI addon
-resource "aws_eks_addon" "csi" {
-  cluster_name = aws_eks_cluster.eks.name
-  addon_name   = "aws-ebs-csi-driver"
-
-  resolve_conflicts_on_create = "OVERWRITE"
-  resolve_conflicts_on_update = "PRESERVE"
-
-  service_account_role_arn = aws_iam_role.workernodes.arn
-
-  tags = merge(local.common_tags, {
-    "eks.amazonaws.com/component" = "ebs-csi-controller"
-  })
-}
