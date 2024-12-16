@@ -84,7 +84,7 @@ variable "min_size" {
 
 variable "instanceType" {
   type    = list(any)
-  default = ["t4g.medium"]
+  default = ["t3.medium"]
 }
 
 variable "cluster_endpoint_public_access_cidrs" {

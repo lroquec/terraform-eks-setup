@@ -57,18 +57,19 @@ resource "aws_iam_role_policy_attachment" "appmesh_access" {
   policy_arn = "arn:aws:iam::aws:policy/AWSAppMeshFullAccess"
 }
 
-resource "aws_iam_role_policy_attachment" "alb_ingress_access" {
-  role       = aws_iam_role.eks-iam-role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSLBControllerPolicy"
-}
-
 ## Create the EKS cluster
 resource "aws_eks_cluster" "eks" {
   name     = var.EKSClusterName
   role_arn = aws_iam_role.eks-iam-role.arn
 
-  enabled_cluster_log_types = ["api", "audit", "scheduler", "controllerManager"]
-  version                   = var.k8sVersion
+  enabled_cluster_log_types     = ["api", "audit", "scheduler", "controllerManager"]
+  version                       = var.k8sVersion
+  bootstrap_self_managed_addons = false
+
+  access_config {
+    authentication_mode = "API"
+  }
+
 
   compute_config {
     enabled       = true
@@ -87,6 +88,11 @@ resource "aws_eks_cluster" "eks" {
       enabled = true
     }
   }
+
+  upgrade_policy {
+    support_type = "STANDARD"
+  }
+
   vpc_config {
     endpoint_private_access = true
     endpoint_public_access  = true
@@ -142,11 +148,6 @@ resource "aws_iam_role_policy_attachment" "AmazonEBSCSIDriverPolicy" {
   role       = aws_iam_role.workernodes.name
 }
 
-resource "aws_iam_role_policy_attachment" "asg_access" {
-  role       = aws_iam_role.workernodes.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2AutoScalingRolePolicy"
-}
-
 resource "aws_eks_node_group" "worker-node-group" {
   cluster_name    = aws_eks_cluster.eks.name
   node_group_name = "workernodes-${var.project_name}"
@@ -189,11 +190,10 @@ resource "aws_security_group_rule" "cluster_ingress" {
 }
 
 resource "aws_security_group_rule" "nodes_ingress" {
-  type                     = "ingress"
-  from_port                = 0
-  to_port                  = 65535
-  protocol                 = "-1"
-  source_security_group_id = aws_eks_cluster.eks.vpc_config[0].cluster_security_group_id
-  security_group_id        = aws_eks_cluster.eks.vpc_config[0].cluster_security_group_id
+  type              = "ingress"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "-1"
+  security_group_id = aws_eks_cluster.eks.vpc_config[0].cluster_security_group_id
 }
 
