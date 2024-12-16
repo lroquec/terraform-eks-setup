@@ -192,14 +192,6 @@ resource "aws_eks_addon" "csi" {
   })
 }
 
-resource "aws_iam_openid_connect_provider" "eks_oidc_provider" {
-  client_id_list = ["sts.amazonaws.com"]
-  thumbprint_list = [
-    "9e99a48a9960a6e3c123f6cf3f97cd3a17da5c85"
-  ]
-  url = aws_eks_cluster.eks.identity[0].oidc[0].issuer
-}
-
 # Additional Security Group Rules
 resource "aws_security_group_rule" "cluster_ingress" {
   type              = "ingress"
