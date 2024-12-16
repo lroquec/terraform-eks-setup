@@ -4,6 +4,8 @@ terraform {
     bucket = "lroquec-tf"
     key    = "eks-terraform.tfstate"
     region = "us-east-1"
+    # For State Locking
+    # dynamodb_table = "demo-ekscluster"  
   }
   required_providers {
     aws = {
