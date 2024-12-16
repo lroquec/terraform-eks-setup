@@ -2,7 +2,7 @@ terraform {
   required_version = ">= 1.7.0"
   backend "s3" {
     bucket = "lroquec-tf"
-    key    = "eks-terraform.tfstate"
+    key    = "eks/eks-terraform.tfstate"
     region = "us-east-1"
     # For State Locking. Required for production environments
     # dynamodb_table = "demo-ekscluster"
