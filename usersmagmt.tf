@@ -36,7 +36,7 @@ locals {
 # Resource: Kubernetes Config Map
 resource "kubernetes_config_map_v1" "aws_auth" {
   depends_on = [
-    aws_eks_cluster.eks_cluster,
+    module.eks,
     kubernetes_cluster_role_binding_v1.eksreadonly_clusterrolebinding,
     kubernetes_cluster_role_binding_v1.eksdeveloper_clusterrolebinding,
     kubernetes_role_binding_v1.eksdeveloper_rolebinding
