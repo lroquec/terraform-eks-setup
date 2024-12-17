@@ -55,7 +55,7 @@ variable "eksIAMRole" {
 
 variable "EKSClusterName" {
   type    = string
-  default = "devEKS"
+  default = "dev-cluster"
 }
 
 variable "k8sVersion" {
