@@ -24,7 +24,7 @@ resource "aws_iam_role" "eks_admin_role" {
       Version = "2012-10-17"
       Statement = [
         {
-          Action   = [
+          Action = [
             "iam:ListRoles",
             "eks:*",
             "ssm:GetParameter"
@@ -34,7 +34,7 @@ resource "aws_iam_role" "eks_admin_role" {
         },
       ]
     })
-  }    
+  }
 
   tags = {
     tag-key = "${local.project_name}-eks-admin-role"
@@ -62,7 +62,7 @@ resource "aws_iam_group_policy" "eksadmins_iam_group_assumerole_policy" {
           "sts:AssumeRole",
         ]
         Effect   = "Allow"
-        Sid    = "AllowAssumeOrganizationAccountRole"
+        Sid      = "AllowAssumeOrganizationAccountRole"
         Resource = "${aws_iam_role.eks_admin_role.arn}"
       },
     ]
@@ -89,7 +89,7 @@ resource "aws_iam_group_policy" "eksadmins_iam_group_assumerole_policy" {
           "sts:AssumeRole",
         ]
         Effect   = "Allow"
-        Sid    = "AllowAssumeOrganizationAccountRole"
+        Sid      = "AllowAssumeOrganizationAccountRole"
         Resource = "${aws_iam_role.eks_admin_role.arn}"
       },
     ]
@@ -98,10 +98,10 @@ resource "aws_iam_group_policy" "eksadmins_iam_group_assumerole_policy" {
 
 # Resource: AWS IAM User 
 resource "aws_iam_user" "eksadmin_user" {
-  name = "var.admin_user_name"
-  path = "/"
+  name          = "var.admin_user_name"
+  path          = "/"
   force_destroy = true
-  tags = local.common_tags
+  tags          = local.common_tags
 }
 
 # Resource: AWS IAM Group Membership

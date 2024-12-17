@@ -31,7 +31,7 @@ resource "aws_iam_role" "eks_developer_role" {
       Version = "2012-10-17"
       Statement = [
         {
-          Action   = [
+          Action = [
             "iam:ListRoles",
             "ssm:GetParameter",
             "eks:DescribeNodegroup",
@@ -50,7 +50,7 @@ resource "aws_iam_role" "eks_developer_role" {
         },
       ]
     })
-  }    
+  }
 
   tags = {
     tag-key = "${local.project_name}-eks-developer-role"
@@ -90,7 +90,7 @@ resource "aws_iam_group_policy" "eksdeveloper_iam_group_assumerole_policy" {
           "sts:AssumeRole",
         ]
         Effect   = "Allow"
-        Sid    = "AllowAssumeOrganizationAccountRole"
+        Sid      = "AllowAssumeOrganizationAccountRole"
         Resource = "${aws_iam_role.eks_developer_role.arn}"
       },
     ]
@@ -99,10 +99,10 @@ resource "aws_iam_group_policy" "eksdeveloper_iam_group_assumerole_policy" {
 
 # Resource: AWS IAM User 
 resource "aws_iam_user" "eksdeveloper_user" {
-  name = var.developer_user_name
-  path = "/"
+  name          = var.developer_user_name
+  path          = "/"
   force_destroy = true
-  tags = local.common_tags
+  tags          = local.common_tags
 }
 
 
@@ -124,18 +124,18 @@ resource "kubernetes_cluster_role_v1" "eksdeveloper_clusterrole" {
   rule {
     api_groups = [""]
     resources  = ["nodes", "namespaces", "pods", "events", "services", "configmaps", "serviceaccounts"]
-    verbs      = ["get", "list"]    
+    verbs      = ["get", "list"]
   }
   rule {
     api_groups = ["apps"]
     resources  = ["deployments", "daemonsets", "statefulsets", "replicasets"]
-    verbs      = ["get", "list"]    
+    verbs      = ["get", "list"]
   }
   rule {
     api_groups = ["batch"]
     resources  = ["jobs"]
-    verbs      = ["get", "list"]    
-  }  
+    verbs      = ["get", "list"]
+  }
 }
 
 # Resource: k8s Cluster Role Binding
@@ -146,7 +146,7 @@ resource "kubernetes_cluster_role_binding_v1" "eksdeveloper_clusterrolebinding" 
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "ClusterRole"
-    name      = kubernetes_cluster_role_v1.eksdeveloper_clusterrole.metadata.0.name 
+    name      = kubernetes_cluster_role_v1.eksdeveloper_clusterrole.metadata.0.name
   }
   subject {
     kind      = "Group"
@@ -158,14 +158,14 @@ resource "kubernetes_cluster_role_binding_v1" "eksdeveloper_clusterrolebinding" 
 # Resource: k8s Role
 resource "kubernetes_role_v1" "eksdeveloper_role" {
   metadata {
-    name = "${local.project_name}-eksdeveloper-role"
-    namespace = kubernetes_namespace_v1.k8s_dev.metadata[0].name 
+    name      = "${local.project_name}-eksdeveloper-role"
+    namespace = kubernetes_namespace_v1.k8s_dev.metadata[0].name
   }
 
   rule {
-    api_groups     = ["", "extensions", "apps"]
-    resources      = ["*"]
-    verbs          = ["*"]
+    api_groups = ["", "extensions", "apps"]
+    resources  = ["*"]
+    verbs      = ["*"]
   }
   rule {
     api_groups = ["batch"]
@@ -178,12 +178,12 @@ resource "kubernetes_role_v1" "eksdeveloper_role" {
 resource "kubernetes_role_binding_v1" "eksdeveloper_rolebinding" {
   metadata {
     name      = "${local.project_name}-eksdeveloper-rolebinding"
-    namespace = kubernetes_namespace_v1.k8s_dev.metadata[0].name 
+    namespace = kubernetes_namespace_v1.k8s_dev.metadata[0].name
   }
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "Role"
-    name      = kubernetes_role_v1.eksdeveloper_role.metadata.0.name 
+    name      = kubernetes_role_v1.eksdeveloper_role.metadata.0.name
   }
   subject {
     kind      = "Group"

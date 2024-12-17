@@ -24,7 +24,7 @@ resource "aws_iam_role" "eks_readonly_role" {
       Version = "2012-10-17"
       Statement = [
         {
-          Action   = [
+          Action = [
             "iam:ListRoles",
             "ssm:GetParameter",
             "eks:DescribeNodegroup",
@@ -43,7 +43,7 @@ resource "aws_iam_role" "eks_readonly_role" {
         },
       ]
     })
-  }    
+  }
 
   tags = {
     tag-key = "${local.project_name}-eks-readonly-role"
@@ -71,7 +71,7 @@ resource "aws_iam_group_policy" "eksreadonly_iam_group_assumerole_policy" {
           "sts:AssumeRole",
         ]
         Effect   = "Allow"
-        Sid    = "AllowAssumeOrganizationAccountRole"
+        Sid      = "AllowAssumeOrganizationAccountRole"
         Resource = "${aws_iam_role.eks_readonly_role.arn}"
       },
     ]
@@ -86,18 +86,18 @@ resource "kubernetes_cluster_role_v1" "eksreadonly_clusterrole" {
   rule {
     api_groups = [""] # These come under core APIs
     resources  = ["nodes", "namespaces", "pods", "events", "services", "configmaps", "serviceaccounts"]
-    verbs      = ["get", "list"]    
+    verbs      = ["get", "list"]
   }
   rule {
     api_groups = ["apps"]
     resources  = ["deployments", "daemonsets", "statefulsets", "replicasets"]
-    verbs      = ["get", "list"]    
+    verbs      = ["get", "list"]
   }
   rule {
     api_groups = ["batch"]
     resources  = ["jobs"]
-    verbs      = ["get", "list"]    
-  }  
+    verbs      = ["get", "list"]
+  }
 }
 
 # Resource: Cluster Role Binding
@@ -108,7 +108,7 @@ resource "kubernetes_cluster_role_binding_v1" "eksreadonly_clusterrolebinding" {
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "ClusterRole"
-    name      = kubernetes_cluster_role_v1.eksreadonly_clusterrole.metadata.0.name 
+    name      = kubernetes_cluster_role_v1.eksreadonly_clusterrole.metadata.0.name
   }
   subject {
     kind      = "Group"
