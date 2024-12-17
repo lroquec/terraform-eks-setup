@@ -107,3 +107,8 @@ variable "vpc_create_database_subnet_route_table" {
   type        = bool
   default     = true
 }
+
+variable "admin_user_name" {
+  description = "The name of the admin user"
+  type        = string
+}
