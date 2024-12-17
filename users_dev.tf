@@ -24,37 +24,41 @@ resource "aws_iam_role" "eks_developer_role" {
       },
     ]
   })
-  inline_policy {
-    name = "eks-developer-access-policy"
-
-    policy = jsonencode({
-      Version = "2012-10-17"
-      Statement = [
-        {
-          Action = [
-            "iam:ListRoles",
-            "ssm:GetParameter",
-            "eks:DescribeNodegroup",
-            "eks:ListNodegroups",
-            "eks:DescribeCluster",
-            "eks:ListClusters",
-            "eks:AccessKubernetesApi",
-            "eks:ListUpdates",
-            "eks:ListFargateProfiles",
-            "eks:ListIdentityProviderConfigs",
-            "eks:ListAddons",
-            "eks:DescribeAddonVersions"
-          ]
-          Effect   = "Allow"
-          Resource = "*"
-        },
-      ]
-    })
-  }
 
   tags = {
     tag-key = "${local.project_name}-eks-developer-role"
   }
+}
+
+resource "aws_iam_role_policy" "eks-developer-access-policy" {
+  name = "eks-developer-access-policy"
+  role = aws_iam_role.eks_developer_role.id
+
+  # Terraform's "jsonencode" function converts a
+  # Terraform expression result to valid JSON syntax.
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "iam:ListRoles",
+          "ssm:GetParameter",
+          "eks:DescribeNodegroup",
+          "eks:ListNodegroups",
+          "eks:DescribeCluster",
+          "eks:ListClusters",
+          "eks:AccessKubernetesApi",
+          "eks:ListUpdates",
+          "eks:ListFargateProfiles",
+          "eks:ListIdentityProviderConfigs",
+          "eks:ListAddons",
+          "eks:DescribeAddonVersions"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
 }
 
 # Associate IAM Policy to IAM Role

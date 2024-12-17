@@ -17,40 +17,15 @@ resource "aws_iam_role" "eks_admin_role" {
       },
     ]
   })
-  inline_policy {
-    name = "eks-full-access-policy"
-
-    policy = jsonencode({
-      Version = "2012-10-17"
-      Statement = [
-        {
-          Action = [
-            "iam:ListRoles",
-            "eks:*",
-            "ssm:GetParameter"
-          ]
-          Effect   = "Allow"
-          Resource = "*"
-        },
-      ]
-    })
-  }
 
   tags = {
     tag-key = "${local.project_name}-eks-admin-role"
   }
 }
 
-# Resource: AWS IAM Group 
-resource "aws_iam_group" "eksadmins_iam_group" {
-  name = "${local.project_name}-eksadmins"
-  path = "/"
-}
-
-# Resource: AWS IAM Group Policy
-resource "aws_iam_group_policy" "eksadmins_iam_group_assumerole_policy" {
-  name  = "${local.project_name}-eksadmins-group-policy"
-  group = aws_iam_group.eksadmins_iam_group.name
+resource "aws_iam_role_policy" "eks-full-access-policy" {
+  name = "eks-full-access-policy"
+  role = aws_iam_role.eks_admin_role.id
 
   # Terraform's "jsonencode" function converts a
   # Terraform expression result to valid JSON syntax.
@@ -59,15 +34,17 @@ resource "aws_iam_group_policy" "eksadmins_iam_group_assumerole_policy" {
     Statement = [
       {
         Action = [
-          "sts:AssumeRole",
+          "iam:ListRoles",
+          "eks:*",
+          "ssm:GetParameter"
         ]
         Effect   = "Allow"
-        Sid      = "AllowAssumeOrganizationAccountRole"
-        Resource = "${aws_iam_role.eks_admin_role.arn}"
+        Resource = "*"
       },
     ]
   })
 }
+
 # Resource: AWS IAM Group 
 resource "aws_iam_group" "eksadmins_iam_group" {
   name = "${local.project_name}-eksadmins"
