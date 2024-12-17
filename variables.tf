@@ -112,3 +112,8 @@ variable "admin_user_name" {
   description = "The name of the admin user"
   type        = string
 }
+
+variable "developer_user_name" {
+  description = "The name of the developer user"
+  type        = string
+}
