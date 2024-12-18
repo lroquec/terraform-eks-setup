@@ -70,8 +70,6 @@ module "eks" {
     }
   }
 
-
-
   fargate_profile_defaults = {
     iam_role_additional_policies = {
       ebs_policy                                 = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy" #IAM rights needed by CSI driver
