@@ -53,8 +53,8 @@ module "eks" {
   eks_managed_node_groups = {
 
     node_group = {
-      min_size     = 2
-      max_size     = 3
+      min_size     = var.min_size
+      max_size     = var.max_size
       desired_size = var.desired_size
     }
   }
