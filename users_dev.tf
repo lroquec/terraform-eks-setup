@@ -102,24 +102,6 @@ resource "aws_iam_group_policy" "eksdeveloper_iam_group_assumerole_policy" {
   })
 }
 
-# Resource: AWS IAM User 
-resource "aws_iam_user" "eksdeveloper_user" {
-  name          = var.developer_user_name
-  path          = "/"
-  force_destroy = true
-  tags          = local.common_tags
-}
-
-
-# Resource: AWS IAM Group Membership
-resource "aws_iam_group_membership" "eksdeveloper" {
-  name = "${local.project_name}-eksdeveloper-group-membership"
-  users = [
-    aws_iam_user.eksdeveloper_user.name
-  ]
-  group = aws_iam_group.eksdeveloper_iam_group.name
-}
-
 # Resource: k8s Cluster Role
 resource "kubernetes_cluster_role_v1" "eksdeveloper_clusterrole" {
   depends_on = [null_resource.wait_for_cluster]
