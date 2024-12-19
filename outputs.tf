@@ -7,7 +7,7 @@ output "vpc_id" {
 # EKS Cluster Outputs
 output "cluster_id" {
   description = "The name/id of the EKS cluster."
-  value       = module.eks.cluster_id
+  value       = module.eks.cluster_name
 }
 
 output "cluster_endpoint" {
