@@ -8,67 +8,19 @@ This project sets up a Virtual Private Cloud (VPC) and an Amazon Elastic Kuberne
 01-vpc-and-cluster-setup/
 ├── .gitignore
 ├── .terraform/
-├── 
-
-data.tf
-
-
-├── 
-
-eks.tf
-
-
-├── 
-
-networking.tf
-
-
-├── 
-
-outputs.tf
-
-
-├── 
-
-providers.tf
-
-
-├── 
-
-README.md
-
-
-├── 
-
-shared_locals.tf
-
-
+├── data.tf
+├── eks.tf
+├── networking.tf
+├── outputs.tf
+├── providers.tf
+├── README.md
+├── shared_locals.tf
 ├── terraform.tfvars
-├── 
-
-users_admins.tf
-
-
-├── 
-
-users_dev.tf
-
-
-├── 
-
-users_readonly.tf
-
-
-├── 
-
-usersmagmt.tf
-
-
-└── 
-
-variables.tf
-
-
+├── users_admins.tf
+├── users_dev.tf
+├── users_readonly.tf
+├── usersmagmt.tf
+└── variables.tf
 ```
 
 ## Files Description
@@ -114,9 +66,7 @@ variables.tf
 
 The project uses several variables defined in 
 
-variables.tf
-
- and `terraform.tfvars`. Here are some key variables:
+`variables.tf` and `terraform.tfvars`. Here are some key variables:
 
 - `project_name`: The name of the project.
 - `vpc_cidr`: The CIDR block for the VPC.
@@ -130,9 +80,7 @@ variables.tf
 
 The project provides several outputs defined in 
 
-outputs.tf
-
-:
+`outputs.tf`:
 
 - `vpc_id`: The ID of the VPC.
 - `cluster_id`: The name/id of the EKS cluster.
@@ -145,48 +93,17 @@ outputs.tf
 
 The project sets up IAM roles and policies for different user groups:
 
-- **Admin Users**: Defined in 
-
-users_admins.tf
-
-, includes full access to EKS and related resources.
-- **Developer Users**: Defined in 
-
-users_dev.tf
-
-, includes access to EKS and additional AWS services like S3 and DynamoDB.
-- **Read-Only Users**: Defined in 
-
-users_readonly.tf
-
-, includes read-only access to EKS resources.
+- **Admin Users**: Defined in `users_admins.tf`, includes full access to EKS and related resources.
+- **Developer Users**: Defined in `users_dev.tf`, includes access to EKS and additional AWS services like S3 and DynamoDB.
+- **Read-Only Users**: Defined in `users_readonly.tf`, includes read-only access to EKS resources.
 
 ## Kubernetes Resources
 
 The project also sets up Kubernetes resources for managing access within the cluster:
 
-- **Cluster Roles and Role Bindings**: Defined in 
-
-users_admins.tf
-
-, 
-
-users_dev.tf
-
-, and 
-
-users_readonly.tf
-
-.
-- **Namespaces**: Defined in 
-
-users_dev.tf
-
-.
+- **Cluster Roles and Role Bindings**: Defined in `users_admins.tf`, `users_dev.tf`, and `users_readonly.tf`.
+- **Namespaces**: Defined in `users_dev.tf`.
 
 ## Managing AWS Auth ConfigMap
 
-The 
-usersmagmt.tf
-
- file manages the AWS Auth ConfigMap for the EKS cluster, ensuring that the IAM roles are correctly mapped to Kubernetes RBAC roles.
+The `usersmagmt.tf` file manages the AWS Auth ConfigMap for the EKS cluster, ensuring that the IAM roles are correctly mapped to Kubernetes RBAC roles.
