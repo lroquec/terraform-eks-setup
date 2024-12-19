@@ -1,296 +1,192 @@
-# EKS Terraform Infrastructure Project
+# VPC and EKS Cluster Setup
 
-This repository contains Terraform configurations to deploy an Amazon EKS (Elastic Kubernetes Service) cluster with associated networking and compute resources.
+This project sets up a Virtual Private Cloud (VPC) and an Amazon Elastic Kubernetes Service (EKS) cluster using Terraform. It includes configurations for IAM roles, policies, and Kubernetes resources to manage access and permissions for different user groups.
 
-## Prerequisites
+## Project Structure
 
-- Terraform >= 1.7.0
-- AWS CLI configured
-- S3 bucket for Terraform state (`lroquec-tf`)
-
-## Infrastructure Components
-
-### VPC and Networking
-- Custom VPC with public and private subnets
-- NAT Gateway for private subnet connectivity
-- Database subnets
-- Proper tagging for EKS integration
-
-### EKS Module
-
-- **`source`**  
-  - **Value:** `terraform-aws-modules/eks/aws`  
-  - **Version:** `~> 20.0`  
-
-### Cluster Configuration
-
-- **`cluster_name`**  
-  - **Value:** Derived from the variable `var.EKSClusterName`.  
-
-- **`cluster_version`**  
-  - **Value:** `1.31`.  
-
-- **`cluster_endpoint_public_access`**  
-  - **Value:** `true` (enables public access to the API server).  
-
-- **`vpc_id`**  
-  - **Value:** Referenced from `module.vpc.vpc_id`.  
-
-- **`subnet_ids`**  
-  - **Value:** Referenced from `module.vpc.private_subnets`.  
-
-- **`cluster_enabled_log_types`**  
-  - **Description:** Enabled logs for the cluster.  
-  - **Values:**  
-    - `audit`  
-    - `api`  
-    - `authenticator`  
-    - `controllerManager`  
-    - `scheduler`  
-
-### Cluster Add-ons
-
-Add-ons deployed with the cluster:
-
-- `coredns`
-- `kube-proxy`
-- `vpc-cni` (most recent version enabled)  
-- `aws-ebs-csi-driver` (most recent version enabled)  
-- `amazon-cloudwatch-observability` (most recent version enabled)  
-
-### Cluster Access
-
-- **`enable_cluster_creator_admin_permissions`**  
-  - **Description:** Grants administrative permissions to the identity creating the cluster.  
-  - **Value:** `true`.
-
-### Managed Node Group Defaults
-
-- **`ami_type`**  
-  - **Value:** `AL2023_x86_64_STANDARD`.  
-
-- **`instance_types`**  
-  - **Value:** Referenced from `var.instanceType`.  
-
-- **`iam_role_additional_policies`**  
-  - **Policies:**  
-    - `AmazonEBSCSIDriverPolicy`  
-    - `AutoScalingFullAccess`  
-    - `CloudWatchAgentServerPolicy`  
-    - `AWSXrayWriteOnlyAccess`  
-
-### Managed Node Groups
-
-- **Node Group Name:** `node_group`  
-- **`min_size`**  
-  - **Value:** `2`.  
-- **`max_size`**  
-  - **Value:** `3`.  
-- **`desired_size`**  
-  - **Value:** Referenced from `var.desired_size`.
-
-### Security Group Rules
-
-- **Rule Name:** `http_traffic_node_to_node`  
-  - **Description:** Allow HTTP traffic between nodes.  
-  - **Type:** `ingress`.  
-  - **Port Range:** `80`.  
-  - **Protocol:** `tcp`.  
-
-### Fargate Profile Defaults
-
-- **`iam_role_additional_policies`**  
-  - **Policies:**  
-    - `AmazonEBSCSIDriverPolicy`  
-    - `AutoScalingFullAccess`  
-    - `CloudWatchAgentServerPolicy`  
-    - `AWSXrayWriteOnlyAccess`  
-
-### Fargate Profiles
-
-- **Profile Name:** `deployment`  
-  - **Namespace:** `fargate-test`.  
-  - **Tags:**  
-    - `Owner: secondary`.
-
-### Tags
-
-- Tags applied to the cluster are referenced from `local.common_tags`.
-
----
-
-## Resource: Update Desired Size
-
-A `null_resource` is used to trigger updates to the desired size of the node group when the `var.desired_size` changes.
-
-### Provisioner
-
-- **Command:** Updates the node group scaling configuration using the AWS CLI.  
-
-```bash
-aws eks update-nodegroup-config \
-  --cluster-name ${module.eks.cluster_name} \
-  --nodegroup-name ${element(split(":", module.eks.eks_managed_node_groups["node_group"].node_group_id), 1)} \
-  --scaling-config desiredSize=${var.desired_size} \
-  --region us-east-1 \
-  --profile default
 ```
+01-vpc-and-cluster-setup/
+├── .gitignore
+├── .terraform/
+├── 
+
+data.tf
+
+
+├── 
+
+eks.tf
+
+
+├── 
+
+networking.tf
+
+
+├── 
+
+outputs.tf
+
+
+├── 
+
+providers.tf
+
+
+├── 
+
+README.md
+
+
+├── 
+
+shared_locals.tf
+
+
+├── terraform.tfvars
+├── 
+
+users_admins.tf
+
+
+├── 
+
+users_dev.tf
+
+
+├── 
+
+users_readonly.tf
+
+
+├── 
+
+usersmagmt.tf
+
+
+└── 
+
+variables.tf
+
+
+```
+
+## Files Description
+
+- **data.tf**: Defines data sources for the EKS cluster and its authentication.
+- **eks.tf**: Configures the EKS cluster and its managed node groups.
+- **networking.tf**: Sets up the VPC and its subnets.
+- **outputs.tf**: Defines the outputs for the VPC and EKS cluster.
+- **providers.tf**: Specifies the required providers and their configurations.
+- **shared_locals.tf**: Contains local variables used across the project.
+- **terraform.tfvars**: Defines variable values for the project.
+- **users_admins.tf**: Configures IAM roles, policies, and groups for admin users.
+- **users_dev.tf**: Configures IAM roles, policies, and groups for developer users.
+- **users_readonly.tf**: Configures IAM roles, policies, and groups for read-only users.
+- **usersmagmt.tf**: Manages the AWS Auth ConfigMap for the EKS cluster.
+- **variables.tf**: Defines the variables used in the project.
+
+## Setup Instructions
+
+1. **Install Terraform**: Ensure you have Terraform installed on your machine. You can download it from [Terraform's official website](https://www.terraform.io/downloads.html).
+
+2. **Configure AWS CLI**: Make sure you have the AWS CLI configured with the necessary permissions to create resources. You can configure it using:
+   ```sh
+   aws configure
+   ```
+
+3. **Initialize Terraform**: Navigate to the project directory and run:
+   ```sh
+   terraform init
+   ```
+
+4. **Plan the Infrastructure**: Review the changes Terraform will make by running:
+   ```sh
+   terraform plan
+   ```
+
+5. **Apply the Configuration**: Apply the Terraform configuration to create the resources:
+   ```sh
+   terraform apply
+   ```
 
 ## Variables
 
-### Project Configuration
+The project uses several variables defined in 
 
-- **`project_name`**  
-  - **Description:** The name of the project.  
-  - **Type:** `string`  
+variables.tf
 
-### VPC Configuration
+ and `terraform.tfvars`. Here are some key variables:
 
-- **`vpc_cidr`**  
-  - **Description:** The CIDR block for the VPC.  
-  - **Type:** `string`  
-  - **Default:** `10.0.0.0/16`  
-  - **Validation:** Ensures the provided value is a valid CIDR block.
-
-- **`subnet_config`**  
-  - **Description:** Configuration for the VPC subnets, defining CIDR blocks and public/private settings.  
-  - **Type:** `map(object)`  
-  - **Default:**  
-    ```hcl
-    {
-      subnet1 = {
-        cidr_block = "10.0.1.0/24"
-        public     = true
-      }
-      subnet2 = {
-        cidr_block = "10.0.2.0/24"
-        public     = true
-      }
-      subnet3 = {
-        cidr_block = "10.0.3.0/24"
-        public     = false
-      }
-      subnet4 = {
-        cidr_block = "10.0.4.0/24"
-        public     = false
-      }
-    }
-    ```  
-  - **Validation:** Ensures all `cidr_block` values are valid CIDR blocks.
-
-### EKS Cluster Configuration
-
-- **`eksIAMRole`**  
-  - **Description:** IAM Role for the EKS cluster.  
-  - **Type:** `string`  
-  - **Default:** `devEKSCluster`
-
-- **`EKSClusterName`**  
-  - **Description:** Name of the EKS cluster.  
-  - **Type:** `string`  
-  - **Default:** `devEKS`
-
-- **`k8sVersion`**  
-  - **Description:** Kubernetes version for the EKS cluster.  
-  - **Type:** `string`  
-  - **Default:** `1.30`
-
-- **`workerNodeIAM`**  
-  - **Description:** IAM Role for EKS worker nodes.  
-  - **Type:** `string`  
-  - **Default:** `devWorkerNodes`
-
-### EKS Cluster Scaling
-
-- **`max_size`**  
-  - **Description:** Maximum size of the worker node group.  
-  - **Type:** `string`  
-  - **Default:** `3`
-
-- **`desired_size`**  
-  - **Description:** Desired size of the worker node group.  
-  - **Type:** `string`  
-  - **Default:** `2`
-
-- **`min_size`**  
-  - **Description:** Minimum size of the worker node group.  
-  - **Type:** `string`  
-  - **Default:** `1`
-
-- **`instanceType`**  
-  - **Description:** List of instance types for the worker nodes.  
-  - **Type:** `list(any)`  
-  - **Default:** `["t3.medium"]`
-
-### API Endpoint Access
-
-- **`cluster_endpoint_public_access_cidrs`**  
-  - **Description:** List of CIDR blocks allowed to access the Amazon EKS public API server endpoint.  
-  - **Type:** `list(string)`  
-  - **Default:** `["0.0.0.0/0"]`
-
-### Database Subnet Configuration
-
-- **`vpc_database_subnets`**  
-  - **Description:** CIDR blocks for database subnets.  
-  - **Type:** `list(string)`  
-  - **Default:** `["10.0.151.0/24", "10.0.152.0/24"]`
-
-- **`vpc_create_database_subnet_group`**  
-  - **Description:** Whether to create a database subnet group.  
-  - **Type:** `bool`  
-  - **Default:** `true`
-
-- **`vpc_create_database_subnet_route_table`**  
-  - **Description:** Whether to create a route table for the database subnet.  
-  - **Type:** `bool`  
-  - **Default:** `true`
+- `project_name`: The name of the project.
+- `vpc_cidr`: The CIDR block for the VPC.
+- `subnet_config`: Configuration for the subnets within the VPC.
+- `EKSClusterName`: The name of the EKS cluster.
+- `instanceType`: The instance types for the EKS managed node groups.
+- `admin_user_name`: The name of the admin user.
+- `developer_user_name`: The name of the developer user.
 
 ## Outputs
 
-### VPC Outputs
+The project provides several outputs defined in 
 
-- **`vpc_id`**  
-  - **Description:** The ID of the VPC.  
-  - **Value:** Sourced from `module.vpc.vpc_id`.
+outputs.tf
 
-### EKS Cluster Outputs
+:
 
-- **`cluster_id`**  
-  - **Description:** The name or ID of the EKS cluster.  
-  - **Value:** Sourced from `module.eks.cluster_id`.
+- `vpc_id`: The ID of the VPC.
+- `cluster_id`: The name/id of the EKS cluster.
+- `cluster_endpoint`: The endpoint for the EKS Kubernetes API.
+- `cluster_certificate_authority_data`: The base64 encoded certificate data required to communicate with the cluster.
+- `aws_iam_openid_connect_provider_arn`: The ARN of the AWS IAM Open ID Connect Provider.
+- `aws_iam_openid_connect_provider_extract_from_arn`: The extracted ARN of the AWS IAM Open ID Connect Provider.
 
-- **`cluster_endpoint`**  
-  - **Description:** The endpoint for the EKS Kubernetes API.  
-  - **Value:** Sourced from `module.eks.cluster_endpoint`.
+## IAM Roles and Policies
 
-- **`cluster_certificate_authority_data`**  
-  - **Description:** Certificate-authority-data for the EKS cluster, base64 encoded. This is required for secure communication with the cluster.  
-  - **Value:** Sourced from `module.eks.cluster_certificate_authority_data`.
+The project sets up IAM roles and policies for different user groups:
 
-### AWS IAM Open ID Connect Provider Outputs
+- **Admin Users**: Defined in 
 
-- **`aws_iam_openid_connect_provider_arn`**  
-  - **Description:** The Amazon Resource Name (ARN) for the AWS IAM Open ID Connect (OIDC) provider associated with the EKS cluster.  
-  - **Value:** Sourced from `module.eks.oidc_provider_arn`.
+users_admins.tf
 
-- **`aws_iam_openid_connect_provider_extract_from_arn`**  
-  - **Description:** The OIDC provider extracted from the ARN.  
-  - **Value:** Sourced from `module.eks.oidc_provider`.
+, includes full access to EKS and related resources.
+- **Developer Users**: Defined in 
 
-## Usage
+users_dev.tf
 
-1. Initialize Terraform:
-```bash
-terraform init
-```
+, includes access to EKS and additional AWS services like S3 and DynamoDB.
+- **Read-Only Users**: Defined in 
 
-2. Review planned changes:
-```bash
-terraform plan
-```
+users_readonly.tf
 
-3. Apply the configuration:
-```bash
-terraform apply
-```
+, includes read-only access to EKS resources.
+
+## Kubernetes Resources
+
+The project also sets up Kubernetes resources for managing access within the cluster:
+
+- **Cluster Roles and Role Bindings**: Defined in 
+
+users_admins.tf
+
+, 
+
+users_dev.tf
+
+, and 
+
+users_readonly.tf
+
+.
+- **Namespaces**: Defined in 
+
+users_dev.tf
+
+.
+
+## Managing AWS Auth ConfigMap
+
+The 
+usersmagmt.tf
+
+ file manages the AWS Auth ConfigMap for the EKS cluster, ensuring that the IAM roles are correctly mapped to Kubernetes RBAC roles.
