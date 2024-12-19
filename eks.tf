@@ -88,7 +88,7 @@ resource "null_resource" "update_desired_size" {
         --cluster-name ${module.eks.cluster_name} \
         --nodegroup-name ${element(split(":", module.eks.eks_managed_node_groups["node_group"].node_group_id), 1)} \
         --scaling-config desiredSize=${var.desired_size} \
-        --region us-east-1 \
+        --region ${var.region} \
         --profile default
     EOT
   }
