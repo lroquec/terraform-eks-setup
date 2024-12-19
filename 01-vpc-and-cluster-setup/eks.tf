@@ -6,7 +6,6 @@ module "eks" {
   cluster_version                = "1.31"
   cluster_endpoint_public_access = true
 
-
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
 
@@ -20,7 +19,7 @@ module "eks" {
 
   cluster_addons = {
     coredns = {}
-    # eks-pod-identity-agent = {}
+
     kube-proxy = {}
     vpc-cni = {
       most_recent = true
@@ -70,49 +69,26 @@ module "eks" {
     }
   }
 
-  fargate_profile_defaults = {
-    iam_role_additional_policies = {
-      ebs_policy                                 = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy" #IAM rights needed by CSI driver
-      auto_scaling_policy                        = "arn:aws:iam::aws:policy/AutoScalingFullAccess"
-      cloudwatch_container_insights_agent_policy = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
-      xray_policy                                = "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
-    }
-  }
-
-  fargate_profiles = {
-    deployment = {
-      name = "example"
-      selectors = [
-        {
-          namespace = "fargate-test"
-        }
-      ]
-
-      tags = {
-        Owner = "secondary"
-      }
-    }
-
-  }
-
-  tags = local.common_tags
 }
 
-resource "null_resource" "update_desired_size" {
-  triggers = {
-    desired_size = var.desired_size
-  }
-
-  provisioner "local-exec" {
-    interpreter = ["/bin/bash", "-c"]
-
-    command = <<-EOT
-      aws eks update-nodegroup-config \
-        --cluster-name ${module.eks.cluster_name} \
-        --nodegroup-name ${element(split(":", module.eks.eks_managed_node_groups["node_group"].node_group_id), 1)} \
-        --scaling-config desiredSize=${var.desired_size} \
-        --region us-east-1 \
-        --profile default
-    EOT
-  }
+resource "null_resource" "wait_for_cluster" {
+  depends_on = [module.eks]
 }
+# resource "null_resource" "update_desired_size" {
+#   triggers = {
+#     desired_size = var.desired_size
+#   }
+
+#   provisioner "local-exec" {
+#     interpreter = ["/bin/bash", "-c"]
+
+#     command = <<-EOT
+#       aws eks update-nodegroup-config \
+#         --cluster-name ${module.eks.cluster_name} \
+#         --nodegroup-name ${element(split(":", module.eks.eks_managed_node_groups["node_group"].node_group_id), 1)} \
+#         --scaling-config desiredSize=${var.desired_size} \
+#         --region us-east-1 \
+#         --profile default
+#     EOT
+#   }
+#}
