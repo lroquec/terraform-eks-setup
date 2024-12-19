@@ -117,3 +117,10 @@ variable "developer_user_name" {
   description = "The name of the developer user"
   type        = string
 }
+
+variable "region" {
+  description = "The region in which the resources will be created"
+  type        = string
+  default     = "us-east-1"
+  
+}

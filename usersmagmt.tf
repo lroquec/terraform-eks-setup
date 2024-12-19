@@ -69,7 +69,7 @@ resource "null_resource" "update_aws_auth" {
 
   provisioner "local-exec" {
     command = <<-EOT
-      aws eks update-kubeconfig --name ${module.eks.cluster_name} --region us-east-1
+      aws eks update-kubeconfig --name ${module.eks.cluster_name} --region ${var.region}
       kubectl patch configmap/aws-auth -n kube-system --patch '${local.patch_data}'
     EOT
   }
