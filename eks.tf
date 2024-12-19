@@ -74,21 +74,22 @@ module "eks" {
 resource "null_resource" "wait_for_cluster" {
   depends_on = [module.eks]
 }
-# resource "null_resource" "update_desired_size" {
-#   triggers = {
-#     desired_size = var.desired_size
-#   }
 
-#   provisioner "local-exec" {
-#     interpreter = ["/bin/bash", "-c"]
+resource "null_resource" "update_desired_size" {
+  triggers = {
+    desired_size = var.desired_size
+  }
 
-#     command = <<-EOT
-#       aws eks update-nodegroup-config \
-#         --cluster-name ${module.eks.cluster_name} \
-#         --nodegroup-name ${element(split(":", module.eks.eks_managed_node_groups["node_group"].node_group_id), 1)} \
-#         --scaling-config desiredSize=${var.desired_size} \
-#         --region us-east-1 \
-#         --profile default
-#     EOT
-#   }
-#}
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+
+    command = <<-EOT
+      aws eks update-nodegroup-config \
+        --cluster-name ${module.eks.cluster_name} \
+        --nodegroup-name ${element(split(":", module.eks.eks_managed_node_groups["node_group"].node_group_id), 1)} \
+        --scaling-config desiredSize=${var.desired_size} \
+        --region us-east-1 \
+        --profile default
+    EOT
+  }
+}
