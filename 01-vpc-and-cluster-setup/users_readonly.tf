@@ -84,6 +84,7 @@ resource "aws_iam_group_policy" "eksreadonly_iam_group_assumerole_policy" {
 
 # Resource: Cluster Role
 resource "kubernetes_cluster_role_v1" "eksreadonly_clusterrole" {
+  depends_on = [null_resource.wait_for_cluster]
   metadata {
     name = "${local.project_name}-eksreadonly-clusterrole"
   }
@@ -106,6 +107,7 @@ resource "kubernetes_cluster_role_v1" "eksreadonly_clusterrole" {
 
 # Resource: Cluster Role Binding
 resource "kubernetes_cluster_role_binding_v1" "eksreadonly_clusterrolebinding" {
+  depends_on = [null_resource.wait_for_cluster]
   metadata {
     name = "${local.project_name}-eksreadonly-clusterrolebinding"
   }
@@ -120,4 +122,3 @@ resource "kubernetes_cluster_role_binding_v1" "eksreadonly_clusterrolebinding" {
     api_group = "rbac.authorization.k8s.io"
   }
 }
- 
