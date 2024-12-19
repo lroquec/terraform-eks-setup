@@ -1,5 +1,6 @@
 # Resource: k8s namespace
 resource "kubernetes_namespace_v1" "k8s_dev" {
+  depends_on = [null_resource.wait_for_cluster]
   metadata {
     name = "dev"
   }
@@ -121,6 +122,7 @@ resource "aws_iam_group_membership" "eksdeveloper" {
 
 # Resource: k8s Cluster Role
 resource "kubernetes_cluster_role_v1" "eksdeveloper_clusterrole" {
+  depends_on = [null_resource.wait_for_cluster]
   metadata {
     name = "${local.project_name}-eksdeveloper-clusterrole"
   }
@@ -144,6 +146,7 @@ resource "kubernetes_cluster_role_v1" "eksdeveloper_clusterrole" {
 
 # Resource: k8s Cluster Role Binding
 resource "kubernetes_cluster_role_binding_v1" "eksdeveloper_clusterrolebinding" {
+  depends_on = [null_resource.wait_for_cluster]
   metadata {
     name = "${local.project_name}-eksdeveloper-clusterrolebinding"
   }
@@ -161,6 +164,7 @@ resource "kubernetes_cluster_role_binding_v1" "eksdeveloper_clusterrolebinding" 
 
 # Resource: k8s Role
 resource "kubernetes_role_v1" "eksdeveloper_role" {
+  depends_on = [null_resource.wait_for_cluster]
   metadata {
     name      = "${local.project_name}-eksdeveloper-role"
     namespace = kubernetes_namespace_v1.k8s_dev.metadata[0].name
@@ -180,6 +184,7 @@ resource "kubernetes_role_v1" "eksdeveloper_role" {
 
 # Resource: k8s Role Binding
 resource "kubernetes_role_binding_v1" "eksdeveloper_rolebinding" {
+  depends_on = [null_resource.wait_for_cluster]
   metadata {
     name      = "${local.project_name}-eksdeveloper-rolebinding"
     namespace = kubernetes_namespace_v1.k8s_dev.metadata[0].name
