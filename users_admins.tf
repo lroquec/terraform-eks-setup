@@ -72,20 +72,3 @@ resource "aws_iam_group_policy" "eksadmins_iam_group_assumerole_policy" {
     ]
   })
 }
-
-# Resource: AWS IAM User 
-resource "aws_iam_user" "eksadmin_user" {
-  name          = "var.admin_user_name"
-  path          = "/"
-  force_destroy = true
-  tags          = local.common_tags
-}
-
-# Resource: AWS IAM Group Membership
-resource "aws_iam_group_membership" "eksadmins" {
-  name = "${local.project_name}-eksadmins-group-membership"
-  users = [
-    aws_iam_user.eksadmin_user.name
-  ]
-  group = aws_iam_group.eksadmins_iam_group.name
-}

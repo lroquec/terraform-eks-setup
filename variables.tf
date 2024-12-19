@@ -108,11 +108,6 @@ variable "vpc_create_database_subnet_route_table" {
   default     = true
 }
 
-variable "admin_user_name" {
-  description = "The name of the admin user"
-  type        = string
-}
-
 variable "region" {
   description = "The region in which the resources will be created"
   type        = string
