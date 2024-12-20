@@ -27,9 +27,15 @@ module "eks" {
     aws-ebs-csi-driver = {
       most_recent = true
     }
-    amazon-cloudwatch-observability = {
-      most_recent = true
-    }
+    # amazon-cloudwatch-observability = {
+    #   most_recent = true
+    # }
+    # aws-efs-csi-driver = {
+    #   most_recent = true
+    # }
+    # eks-node-monitoring-agent = {
+    #   most_recent = true
+    # }
   }
 
   # Cluster access entry
@@ -46,6 +52,7 @@ module "eks" {
       auto_scaling_policy                        = "arn:aws:iam::aws:policy/AutoScalingFullAccess"
       cloudwatch_container_insights_agent_policy = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
       xray_policy                                = "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
+      efs_policy                                 = "arn:aws:iam::aws:policy/service-role/AmazonEFSCSIDriverPolicy" #Amazon EFS CSI driver policy
     }
   }
 
