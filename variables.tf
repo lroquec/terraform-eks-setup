@@ -1,7 +1,7 @@
 variable "project_name" {
   description = "The name of the project"
   type        = string
-
+  default     = "eks-demo"
 }
 
 variable "vpc_cidr" {
@@ -50,12 +50,12 @@ variable "subnet_config" {
 
 variable "eksIAMRole" {
   type    = string
-  default = "devEKSCluster"
+  default = "eksIAMRole"
 }
 
 variable "EKSClusterName" {
   type    = string
-  default = "dev-cluster"
+  default = "demo-cluster"
 }
 
 variable "k8sVersion" {
@@ -65,7 +65,7 @@ variable "k8sVersion" {
 
 variable "workerNodeIAM" {
   type    = string
-  default = "devWorkerNodes"
+  default = "workerNodesIAMRole"
 }
 
 variable "max_size" {
@@ -112,5 +112,4 @@ variable "region" {
   description = "The region in which the resources will be created"
   type        = string
   default     = "us-east-1"
-
 }
