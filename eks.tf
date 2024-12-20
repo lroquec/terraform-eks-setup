@@ -105,7 +105,6 @@ module "eks" {
   # }
 }
 
-
 resource "null_resource" "wait_for_cluster" {
   depends_on = [module.eks]
 }
