@@ -76,7 +76,35 @@ module "eks" {
     }
   }
 
+  # Fargate profile. If you needed uncomment it.
+  # fargate_profile_defaults = {
+  #   iam_role_additional_policies = {
+  #     ebs_policy                                 = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy" #IAM rights needed by CSI driver
+  #     auto_scaling_policy                        = "arn:aws:iam::aws:policy/AutoScalingFullAccess"
+  #     cloudwatch_container_insights_agent_policy = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+  #     xray_policy                                = "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
+  #   }
+  # }
+
+  # fargate_profiles = {
+  #   deployment = {
+  #     name = "demo"
+  #     selectors = [
+  #       {
+  #         namespace = "fargate-test"
+  #       }
+  #     ]
+
+  #     # # Using specific subnets instead of the subnets supplied for the cluster itself
+  #     # subnet_ids = [module.vpc.private_subnets[1]]
+
+  #     tags = {
+  #       Owner = "secondary"
+  #     }
+  #   }
+  # }
 }
+
 
 resource "null_resource" "wait_for_cluster" {
   depends_on = [module.eks]
