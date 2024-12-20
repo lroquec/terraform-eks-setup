@@ -38,7 +38,7 @@ locals {
       }
     ])
   }
-  
+
   patch_data = jsonencode({
     data = {
       mapRoles = local.aws_auth_configmap_data.mapRoles

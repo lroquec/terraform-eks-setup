@@ -1,1 +1,1 @@
-project_name        = "eks-demo"
+project_name = "eks-demo"
