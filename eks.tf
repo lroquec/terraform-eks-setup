@@ -27,15 +27,14 @@ module "eks" {
     aws-ebs-csi-driver = {
       most_recent = true
     }
+    # This costs money, so it's commented out by default
     # amazon-cloudwatch-observability = {
     #   most_recent = true
     # }
     # aws-efs-csi-driver = {
     #   most_recent = true
     # }
-    # eks-node-monitoring-agent = {
-    #   most_recent = true
-    # }
+
   }
 
   # Cluster access entry
